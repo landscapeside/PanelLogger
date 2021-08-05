@@ -1,0 +1,129 @@
+ext {
+
+    /**
+     * project version conf
+     * */
+    versionMajor = 1
+    versionMinor = 0
+    versionBuild = 0
+    versionPack = 1
+
+    compileSdkVersion = 29
+    buildToolsVersion = "29.0.0"
+    SupportVersion = "29.0.0"
+    minSdkVersion = 21
+    targetSdkVersion = 28
+
+    androidXTest = 'androidx.test:core:1.0.0'
+    testRunner = 'androidx.test:runner:1.1.0'
+    testRules = 'androidx.test:rules:1.1.0'
+    androidXjunit = 'androidx.test.ext:junit:1.0.0'
+    androidXtruth = 'androidx.test.ext:truth:1.0.0'
+    truth = "com.google.truth:truth:1.0.1"
+    junit = 'junit:junit:4.12'
+    robolectric = 'org.robolectric:robolectric:4.3'
+    archTesting = "android.arch.core:core-testing:1.1.1"
+    mockito = 'org.mockito:mockito-core:3.4.0'
+    mockitoInline = 'org.mockito:mockito-inline:3.4.0'
+    mockK = "io.mockk:mockk:1.10.0"
+    espresso = 'androidx.test.espresso:espresso-core:3.1.0'
+
+    multidex = 'androidx.multidex:multidex:2.0.0'
+    androidxVersion = '1.0.0'
+    androidxSupport = 'androidx.appcompat:appcompat:1.0.2'
+    constraint = [group: 'androidx.constraintlayout', name: 'constraintlayout', version: '1.1.2']
+    recyclerView = [group: 'androidx.recyclerview', name: 'recyclerview', version: androidxVersion]
+    appcompatV7 = "com.android.support:appcompat-v7:${SupportVersion}"
+    design = 'com.google.android.material:material:1.0.0'
+    supportV4 = "com.android.support:support-v4:${SupportVersion}"
+    cardView = [group: 'androidx.cardview', name: 'cardview', version: androidxVersion]
+    viewpager2 = "androidx.viewpager2:viewpager2:1.0.0-alpha01"
+    coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
+    coroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3"
+    lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
+
+    liveData = [group: 'androidx.lifecycle', name: 'lifecycle-livedata', version: '2.0.0']
+    liveDataRx = [group: 'androidx.lifecycle', name: 'lifecycle-reactivestreams', version: '2.0.0']
+    liveDataToRxJava = 'com.github.YvesCheung:LiveDataToRxJava:v1.1'
+    room = [group: 'androidx.room', name: 'room-runtime', version: '2.1.0-alpha06']
+    roomRxJava = [group: 'androidx.room', name: 'room-rxjava2', version: '2.1.0-alpha06']
+    roomCompiler = [group: 'androidx.room', name: 'room-compiler', version: '2.1.0-alpha06']
+
+    rxJava = 'io.reactivex.rxjava2:rxjava:2.1.13'
+    rxAndroid = 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    rxPermissions = 'com.github.tbruyelle:rxpermissions:0.10.2'
+
+    okHttp = 'com.squareup.okhttp3:okhttp:3.14.0'
+    okMockWebServer = 'com.squareup.okhttp3:mockwebserver:3.14.0'
+    okHttpLoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:3.4.1"
+    retrofit = "com.squareup.retrofit2:retrofit:2.4.0"
+    retrofitAdapterRxJava = "com.squareup.retrofit2:adapter-rxjava2:2.4.0"
+    retrofitConverterGson = "com.squareup.retrofit2:converter-gson:2.0.0-beta4"
+
+    daggerVersion = '2.16'
+    dagger = "com.google.dagger:dagger:${daggerVersion}"
+    daggerCompiler = "com.google.dagger:dagger-compiler:${daggerVersion}"
+    daggerAndroid = "com.google.dagger:dagger-android:${daggerVersion}"
+    daggerAndroidSupport = "com.google.dagger:dagger-android-support:${daggerVersion}"
+    daggerAndroidCompiler = "com.google.dagger:dagger-android-processor:${daggerVersion}"
+
+    guava = "com.google.guava:guava:23.0"
+
+    timber = "com.jakewharton.timber:timber:4.7.1"
+    logger = 'com.orhanobut:logger:2.2.0'
+
+    gson = "com.google.code.gson:gson:2.6.2"
+    mockApi = 'com.github.landscapeside:MockNetApi:v2.1.3'
+
+    // UI weights
+    immersionBar = 'com.gyf.barlibrary:barlibrary:2.3.0'
+    viewPagerIndicator = "com.github.JakeWharton:ViewPagerIndicator:2.4.1"
+    bgaBanner = 'cn.bingoogolapple:bga-banner:2.2.6@aar'
+    swipeLayout = "com.daimajia.swipelayout:library:1.2.0@aar"
+    photoView = 'com.github.chrisbanes:PhotoView:2.3.0'
+    adapterHelper = 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.34'
+    wheelView = 'com.wx.wheelview:wheelview:1.3.3'
+    zxing = "com.journeyapps:zxing-android-embedded:3.5.0"
+    zxingCore = "com.google.zxing:core:3.3.3"
+    bgaZxing = 'cn.bingoogolapple:bga-qrcode-zxing:1.3.7'
+    matisse = 'com.zhihu.android:matisse:0.5.3-beta3'
+    compressor = "id.zelory:compressor:3.0.0"
+    niceImageView = 'com.github.SheHuan:NiceImageView:1.0.5'
+
+    pandoraDebug = 'com.github.whataa:pandora:v2.0.3'
+    pandoraRelease = 'com.github.whataa:pandora-no-op:v2.0.3'
+
+    walle = 'com.meituan.android.walle:library:1.1.6'
+
+    autodispose = [group: 'com.uber.autodispose', name: 'autodispose-android', version: '1.1.0']
+    autodispose_ktx = [group: 'com.uber.autodispose', name: 'autodispose-ktx', version: '1.1.0']
+    autodispose_android_ktx =
+        [group: 'com.uber.autodispose', name: 'autodispose-android-ktx', version: '1.1.0']
+    autodispose_archs_ktx =
+        [group: 'com.uber.autodispose', name: 'autodispose-android-archcomponents-ktx', version: '1.1.0']
+
+    // RxRouter
+    rxRouter = 'zlc.season:rxrouter:1.0.1'
+    rxRouterCompiler = 'zlc.season:rxrouter-compiler:1.0.1'
+
+    rxDownload = "com.github.ssseasonnn:RxDownload:1.0.9"
+    glide = 'com.github.bumptech.glide:glide:4.9.0'
+    glideCompiler = 'com.github.bumptech.glide:compiler:4.9.0'
+    rxWebSocket = 'com.dhh:websocket2:2.1.4'
+    rxBus = 'com.hwangjr.rxbus:rxbus:2.0.1'
+
+    sliceRouter = "com.github.landscapeside.sliceRouter:slicerouter:0.0.18"
+    sliceRouterCompiler = 'com.github.landscapeside.sliceRouter:slicerouter-compiler:0.0.18'
+
+    shadowState = 'com.github.landscapeside.ShadowState:shadowstate:1.0.2'
+    shadowStateCompiler = 'com.github.landscapeside.ShadowState:shadowstate-compiler:1.0.2'
+
+    rehost = 'com.github.landscapeside:rehost:0.0.7'
+
+    enhancedFloaty = 'com.github.hyb1996:EnhancedFloaty:0.31'
+
+    hotfix = 'com.aliyun.ams:alicloud-android-hotfix:3.2.14'
+
+    buglyUpgrade = "com.tencent.bugly:crashreport_upgrade:1.4.2"
+    buglyCrashNative = "com.tencent.bugly:nativecrashreport:3.7.5"
+}
