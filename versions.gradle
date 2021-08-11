@@ -29,12 +29,12 @@ ext {
     espresso = 'androidx.test.espresso:espresso-core:3.1.0'
 
     multidex = 'androidx.multidex:multidex:2.0.0'
-    androidxVersion = '1.0.0'
-    androidxSupport = 'androidx.appcompat:appcompat:1.0.2'
+    androidxVersion = '1.1.0'
+    androidxSupport = 'androidx.appcompat:appcompat:1.2.0'
     constraint = [group: 'androidx.constraintlayout', name: 'constraintlayout', version: '1.1.2']
     recyclerView = [group: 'androidx.recyclerview', name: 'recyclerview', version: androidxVersion]
     appcompatV7 = "com.android.support:appcompat-v7:${SupportVersion}"
-    design = 'com.google.android.material:material:1.0.0'
+    design = 'com.google.android.material:material:1.2.1'
     supportV4 = "com.android.support:support-v4:${SupportVersion}"
     cardView = [group: 'androidx.cardview', name: 'cardview', version: androidxVersion]
     viewpager2 = "androidx.viewpager2:viewpager2:1.0.0-alpha01"

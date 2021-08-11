@@ -38,15 +38,29 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    buildFeatures.dataBinding = true
+
+    viewBinding {
+        enabled = true
+    }
 }
 
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation 'androidx.core:core-ktx:1.3.2'
     implementation rootProject.ext.androidxSupport
     implementation rootProject.ext.design
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    implementation rootProject.ext.timber
+    implementation rootProject.ext.rxJava
+    implementation rootProject.ext.rxAndroid
+
+    implementation rootProject.ext.gson
+
+    implementation 'com.github.liangjingkanji:BRV:1.3.30'
 }
