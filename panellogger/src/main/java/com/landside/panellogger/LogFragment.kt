@@ -6,24 +6,23 @@ import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.drake.brv.BindingAdapter
-import com.drake.brv.utils.divider
-import com.drake.brv.utils.linear
-import com.drake.brv.utils.setup
+import com.landside.panellogger.LogFragment.LogAdapter.LogHolder
+import com.landside.panellogger.LogFragment.LogPriorityAdapter.PriorityHolder
 import com.landside.panellogger.LogPriority.VERBOSE
+import com.landside.panellogger.databinding.ItemLogPriorityBinding
 import com.landside.panellogger.databinding.PopPriorityBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -33,18 +32,33 @@ import kotlinx.android.synthetic.main.fragment_log.btn_priority
 import kotlinx.android.synthetic.main.fragment_log.et_filter
 import kotlinx.android.synthetic.main.fragment_log.log_list
 import kotlinx.android.synthetic.main.fragment_log.to_bottom
+import kotlinx.android.synthetic.main.item_log.view.log_box
+import kotlinx.android.synthetic.main.item_log.view.tv_divider
+import kotlinx.android.synthetic.main.item_log.view.tv_msg
+import kotlinx.android.synthetic.main.item_log.view.tv_tag
 
 class LogFragment : Fragment(R.layout.fragment_log) {
-  companion object{
+  companion object {
     const val MAX_SIZE = 200
   }
+
   private lateinit var logDisposable: Disposable
-  private lateinit var adapter: BindingAdapter
-  private var listScrollY:Int = 0
+  private lateinit var adapter: LogAdapter
+  private var listScrollY: Int = 0
   private var keyword: String = ""
   private var priority: LogPriority = VERBOSE
-  private var logs: MutableList<LogItem> = mutableListOf()
-  private val logData = MutableLiveData<LogItem>()
+  private val logs: List<LogItem>
+    get() = logData.value?.filter {
+      if (keyword.isNotEmpty()) {
+        it.message.contains(keyword, true)
+      } else {
+        true
+      }
+    }
+        ?.filter {
+          it.priority.value >= priority.value
+        } ?: mutableListOf()
+  private val logData = MutableLiveData<MutableList<LogItem>>()
 
   override fun onDetach() {
     super.onDetach()
@@ -55,35 +69,14 @@ class LogFragment : Fragment(R.layout.fragment_log) {
     super.onActivityCreated(savedInstanceState)
     btn_priority.setOnClickListener { popPriority(it) }
     btn_clean.setOnClickListener { cleanLog(it) }
-    adapter = log_list.linear(reverseLayout = true)
-        .divider(R.drawable.divider_item_decoration_transparent)
-        .setup {
-          addType<LogItem>(R.layout.item_log)
-          onBind {
-            val tv_tag = findView<TextView>(R.id.tv_tag)
-            val tv_divider = findView<TextView>(R.id.tv_divider)
-            val tv_msg = findView<TextView>(R.id.tv_msg)
-            val textColor = ResourcesCompat.getColor(
-                resources, getModel<LogItem>().priority.textColor, null
-            )
-            tv_tag.setTextColor(textColor)
-            tv_tag.text = getModel<LogItem>().tag ?: "Unknown"
-            tv_divider.setTextColor(textColor)
-            tv_msg.setTextColor(textColor)
-            tv_msg.text = getModel<LogItem>().message
-          }
-          R.id.log_box.onClick {
-            val clipboard: ClipboardManager =
-              context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clipData: ClipData =
-              ClipData.newPlainText(null, JSONS.parseJson(getModel<LogItem>()))
-            clipboard.setPrimaryClip(clipData)
-            Toast.makeText(context, "复制成功", Toast.LENGTH_SHORT)
-                .show()
-          }
-        }
+    adapter = LogAdapter()
+    log_list.layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, true)
+    log_list.addItemDecoration(
+        DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
+    )
+    log_list.adapter = adapter
     et_filter.addTextChangedListener {
-      keyword = it?.toString()?:""
+      keyword = it?.toString() ?: ""
       updateLogs()
     }
     log_list.addOnScrollListener(object : OnScrollListener() {
@@ -105,11 +98,11 @@ class LogFragment : Fragment(R.layout.fragment_log) {
     to_bottom.setOnClickListener {
       log_list.scrollToPosition(0)
     }
-    logData.observe(viewLifecycleOwner){
-      logs.add(0, it)
-      logs = logs.take(MAX_SIZE).toMutableList()
+    logData.value = mutableListOf()
+    logData.observe(viewLifecycleOwner) {
       updateLogs()
-      val visiblePosition = (log_list.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+      val visiblePosition =
+        (log_list.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
       if (visiblePosition < 2) {
         log_list.scrollToPosition(0)
       }
@@ -118,12 +111,17 @@ class LogFragment : Fragment(R.layout.fragment_log) {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
-          logData.value = it
+          logData.value = logData.value?.toMutableList()
+              ?.apply {
+                add(0, it)
+              }
+              ?.take(MAX_SIZE)
+              ?.toMutableList()
         }
   }
 
   private fun cleanLog(v: View) {
-    logs.clear()
+    logData.value?.clear()
     updateLogs()
   }
 
@@ -137,22 +135,47 @@ class LogFragment : Fragment(R.layout.fragment_log) {
       setBackgroundDrawable(dw)
       contentView = LayoutInflater.from(context)
           .inflate(R.layout.pop_priority, null)
+      PopPriorityBinding.bind(contentView).popList.layoutManager =
+        LinearLayoutManager(requireContext())
       PopPriorityBinding.bind(contentView).popList
-          .linear()
-          .setup {
-            addType<LogPriority>(R.layout.item_log_priority)
-            onBind {
-              findView<TextView>(R.id.tv_priority_item).text = getModel<LogPriority>().name
-            }
-            R.id.tv_priority_item.onClick {
-              priority = getModel()
-              updatePriority()
-              updateLogs()
-              dismiss()
-            }
-          }.models = LogPriority.values().toList()
+          .adapter = LogPriorityAdapter {
+        priority = it
+        updatePriority()
+        updateLogs()
+        dismiss()
+      }
     }
         .showAsDropDown(v)
+  }
+
+  inner class LogPriorityAdapter(
+    val onItemClick: (LogPriority) -> Unit
+  ) : RecyclerView.Adapter<PriorityHolder>() {
+    val inflater: LayoutInflater = LayoutInflater.from(context)
+
+    inner class PriorityHolder(val itemBinding: ItemLogPriorityBinding) : RecyclerView.ViewHolder(
+        itemBinding.root
+    )
+
+    override fun onCreateViewHolder(
+      parent: ViewGroup,
+      viewType: Int
+    ): PriorityHolder =
+      PriorityHolder(ItemLogPriorityBinding.inflate(inflater,parent,false))
+
+    override fun onBindViewHolder(
+      holder: PriorityHolder,
+      position: Int
+    ) {
+      holder.itemBinding.tvPriorityItem.text = LogPriority.values()[position].name
+      holder.itemBinding.tvPriorityItem.setOnClickListener {
+        onItemClick(LogPriority.values()[position])
+      }
+    }
+
+    override fun getItemCount(): Int = LogPriority.values()
+        .toList().size
+
   }
 
   private fun updatePriority() {
@@ -164,14 +187,47 @@ class LogFragment : Fragment(R.layout.fragment_log) {
   }
 
   private fun updateLogs() {
-    adapter.models = logs.filter {
-      if (keyword.isNotEmpty()) {
-        it.message.contains(keyword, true)
-      } else {
-        true
-      }
-    }.filter {
-      it.priority.value >= priority.value
-    }
+    adapter.notifyDataSetChanged()
   }
+
+  inner class LogAdapter : RecyclerView.Adapter<LogHolder>() {
+    val inflater: LayoutInflater = LayoutInflater.from(context)
+
+    inner class LogHolder(val container: View) : RecyclerView.ViewHolder(
+        container
+    )
+
+    override fun onCreateViewHolder(
+      parent: ViewGroup,
+      viewType: Int
+    ): LogHolder =
+      LogHolder(inflater.inflate(R.layout.item_log,parent,false))
+
+    override fun onBindViewHolder(
+      holder: LogHolder,
+      position: Int
+    ) {
+      val textColor = ResourcesCompat.getColor(
+          resources, logs[position].priority.textColor, null
+      )
+      holder.container.tv_tag.setTextColor(textColor)
+      holder.container.tv_tag.text = logs[position].tag ?: "Unknown"
+      holder.container.tv_divider.setTextColor(textColor)
+      holder.container.tv_msg.setTextColor(textColor)
+      holder.container.tv_msg.text = logs[position].message
+      holder.container.log_box.setOnClickListener {
+        val clipboard: ClipboardManager =
+          requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData: ClipData =
+          ClipData.newPlainText(null, JSONS.parseJson(logs[position]))
+        clipboard.setPrimaryClip(clipData)
+        Toast.makeText(context, "复制成功", Toast.LENGTH_SHORT)
+            .show()
+      }
+    }
+
+    override fun getItemCount(): Int = logs.size
+
+  }
+
 }

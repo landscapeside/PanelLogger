@@ -61,6 +61,4 @@ dependencies {
     implementation rootProject.ext.rxAndroid
 
     implementation rootProject.ext.gson
-
-    implementation 'com.github.liangjingkanji:BRV:1.3.30'
 }

@@ -51,6 +51,7 @@ object Logger {
     }
 
     private fun install(app: Application) {
+      Timber.plant(logTree)
       app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
 
         override fun onActivityStarted(activity: Activity) {
