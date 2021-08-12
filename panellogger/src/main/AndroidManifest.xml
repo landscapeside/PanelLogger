@@ -5,7 +5,7 @@
   <application>
     <provider
       android:name=".Logger$Observer"
-      android:authorities="${applicationId}.SliceRouterProvider"
+      android:authorities="${applicationId}.PanelLoggerProvider"
       android:grantUriPermissions="true"
       android:exported="false">
       <meta-data
