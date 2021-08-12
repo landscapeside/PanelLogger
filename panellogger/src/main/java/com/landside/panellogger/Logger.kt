@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.FrameLayout
 import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
 import com.landside.panellogger.Logger.ShowType.DRAWER_SLIDE
@@ -83,13 +84,23 @@ object Logger {
           if (debug && showType == DRAWER_SLIDE) {
             val globalLayoutListener = object :OnGlobalLayoutListener{
               override fun onGlobalLayout() {
-                val rootView = activity.findViewById(android.R.id.content) as ViewGroup
-                val originView = rootView.getChildAt(0)
-                rootView.removeViewAt(0)
-                val drawerLayout = activity.layoutInflater.inflate(R.layout.view_drawer,null) as DrawerLayout
-                drawerLayout.addView(originView,0)
-                rootView.addView(drawerLayout,0)
                 activity.window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val decorView = (activity.window.decorView as FrameLayout)
+                val originView = decorView.getChildAt(0) as ViewGroup
+                val rootPaddingTop = originView.paddingTop
+                val rootPaddingLeft = originView.paddingLeft
+                val rootPaddingRight = originView.paddingRight
+                val rootPaddingBottom = originView.paddingBottom
+                (originView.parent as ViewGroup).removeView(originView)
+                val drawerLayout =
+                  activity.layoutInflater.inflate(
+                      R.layout.view_drawer, originView, false
+                  ) as DrawerLayout
+                drawerLayout.addView(originView, 0, originView.layoutParams)
+                decorView.addView(drawerLayout,0)
+                decorView.post {
+                  drawerLayout.setPadding(rootPaddingLeft,rootPaddingTop,rootPaddingRight,rootPaddingBottom)
+                }
               }
             }
             activity.window.decorView.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
