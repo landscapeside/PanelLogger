@@ -8,7 +8,7 @@
   android:paddingTop="10dp"
   android:paddingBottom="10dp"
   android:textColor="@color/white"
-  android:background="@color/colorPrimary"
+  android:background="@color/color_E74C3C"
   tools:text="XXXXXX">
 
 </TextView>
