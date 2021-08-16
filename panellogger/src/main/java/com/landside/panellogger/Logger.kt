@@ -9,6 +9,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
 import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.FragmentActivity
 import com.landside.panellogger.Logger.ShowType.DRAWER_SLIDE
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
@@ -81,7 +82,7 @@ object Logger {
           activity: Activity,
           savedInstanceState: Bundle?
         ) {
-          if (debug && showType == DRAWER_SLIDE) {
+          if (debug && showType == DRAWER_SLIDE && activity is FragmentActivity) {
             val globalLayoutListener = object :OnGlobalLayoutListener{
               override fun onGlobalLayout() {
                 activity.window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -100,6 +101,12 @@ object Logger {
                 decorView.addView(drawerLayout,0)
                 decorView.post {
                   drawerLayout.setPadding(rootPaddingLeft,rootPaddingTop,rootPaddingRight,rootPaddingBottom)
+                  val fm = (activity as? FragmentActivity)?.supportFragmentManager
+                  fm?.let {
+                    val transaction = it.beginTransaction()
+                    transaction.add(R.id.log_fragment_box, LogFragment())
+                    transaction.commit()
+                  }
                 }
               }
             }
