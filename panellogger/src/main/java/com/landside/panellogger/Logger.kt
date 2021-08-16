@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.FrameLayout
@@ -21,6 +22,7 @@ object Logger {
     POP_PAGE
   }
 
+  var MAX_SIZE = 200
   var showType: ShowType = DRAWER_SLIDE
   var debug: Boolean = false
   private lateinit var application: Application
@@ -83,7 +85,7 @@ object Logger {
           savedInstanceState: Bundle?
         ) {
           if (debug && showType == DRAWER_SLIDE && activity is FragmentActivity) {
-            val globalLayoutListener = object :OnGlobalLayoutListener{
+            val globalLayoutListener = object : OnGlobalLayoutListener {
               override fun onGlobalLayout() {
                 activity.window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 val decorView = (activity.window.decorView as FrameLayout)
@@ -98,19 +100,24 @@ object Logger {
                       R.layout.view_drawer, originView, false
                   ) as DrawerLayout
                 drawerLayout.addView(originView, 0, originView.layoutParams)
-                decorView.addView(drawerLayout,0)
+                decorView.addView(drawerLayout, 0)
                 decorView.post {
-                  drawerLayout.setPadding(rootPaddingLeft,rootPaddingTop,rootPaddingRight,rootPaddingBottom)
+                  drawerLayout.setPadding(
+                      rootPaddingLeft, rootPaddingTop, rootPaddingRight, rootPaddingBottom
+                  )
                   val fm = (activity as? FragmentActivity)?.supportFragmentManager
                   fm?.let {
                     val transaction = it.beginTransaction()
                     transaction.add(R.id.log_fragment_box, LogFragment())
                     transaction.commit()
+                    drawerLayout.findViewById<FrameLayout>(R.id.log_fragment_box).setPadding(0,0,0,getNavigationBarHeight(activity))
                   }
                 }
               }
             }
-            activity.window.decorView.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
+            activity.window.decorView.viewTreeObserver.addOnGlobalLayoutListener(
+                globalLayoutListener
+            )
           }
         }
 
@@ -119,9 +126,13 @@ object Logger {
   }
 
   fun popLogger() {
-    val intent = Intent(application,LogActivity::class.java)
+    val intent = Intent(application, LogActivity::class.java)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     application.startActivity(intent)
   }
 
+  private fun getNavigationBarHeight(context: Activity): Int {
+    val view: View? = context.findViewById(android.R.id.navigationBarBackground)
+    return view?.height?:0
+  }
 }

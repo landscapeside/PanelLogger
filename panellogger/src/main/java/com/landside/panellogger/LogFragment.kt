@@ -27,20 +27,10 @@ import com.landside.panellogger.databinding.PopPriorityBinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_log.btn_clean
-import kotlinx.android.synthetic.main.fragment_log.btn_priority
-import kotlinx.android.synthetic.main.fragment_log.et_filter
-import kotlinx.android.synthetic.main.fragment_log.log_list
-import kotlinx.android.synthetic.main.fragment_log.to_bottom
-import kotlinx.android.synthetic.main.item_log.view.log_box
-import kotlinx.android.synthetic.main.item_log.view.tv_divider
-import kotlinx.android.synthetic.main.item_log.view.tv_msg
-import kotlinx.android.synthetic.main.item_log.view.tv_tag
+import kotlinx.android.synthetic.main.fragment_log.*
+import kotlinx.android.synthetic.main.item_log.view.*
 
 class LogFragment : Fragment(R.layout.fragment_log) {
-  companion object {
-    const val MAX_SIZE = 200
-  }
 
   private lateinit var logDisposable: Disposable
   private lateinit var adapter: LogAdapter
@@ -115,7 +105,7 @@ class LogFragment : Fragment(R.layout.fragment_log) {
               ?.apply {
                 add(0, it)
               }
-              ?.take(MAX_SIZE)
+              ?.take(Logger.MAX_SIZE)
               ?.toMutableList()
         }
   }
