@@ -30,10 +30,10 @@ object Logger {
 
   val logTree: Timber.Tree = object : Timber.DebugTree() {
     override fun log(
-      priority: Int,
-      tag: String?,
-      message: String,
-      t: Throwable?
+        priority: Int,
+        tag: String?,
+        message: String,
+        t: Throwable?
     ) {
       if (debug) {
         super.log(priority, tag, message, t)
@@ -58,68 +58,77 @@ object Logger {
       Timber.plant(logTree)
       app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
 
-        override fun onActivityStarted(activity: Activity) {
-        }
-
-        override fun onActivityResumed(activity: Activity) {
-
-        }
-
-        override fun onActivityPaused(activity: Activity) {
-        }
-
-        override fun onActivityStopped(activity: Activity) {
-        }
-
-        override fun onActivitySaveInstanceState(
-          activity: Activity,
-          outState: Bundle
-        ) {
-        }
-
-        override fun onActivityDestroyed(activity: Activity) {
-        }
-
-        override fun onActivityCreated(
-          activity: Activity,
-          savedInstanceState: Bundle?
-        ) {
-          if (debug && showType == DRAWER_SLIDE && activity is FragmentActivity) {
-            val globalLayoutListener = object : OnGlobalLayoutListener {
-              override fun onGlobalLayout() {
-                activity.window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                val decorView = (activity.window.decorView as FrameLayout)
-                val originView = decorView.getChildAt(0) as ViewGroup
-                val rootPaddingTop = originView.paddingTop
-                val rootPaddingLeft = originView.paddingLeft
-                val rootPaddingRight = originView.paddingRight
-                val rootPaddingBottom = originView.paddingBottom
-                (originView.parent as ViewGroup).removeView(originView)
-                val drawerLayout =
-                  activity.layoutInflater.inflate(
-                      R.layout.view_drawer, originView, false
-                  ) as DrawerLayout
-                drawerLayout.addView(originView, 0, originView.layoutParams)
-                decorView.addView(drawerLayout, 0)
-                decorView.post {
-                  drawerLayout.setPadding(
-                      rootPaddingLeft, rootPaddingTop, rootPaddingRight, rootPaddingBottom
-                  )
-                  val fm = (activity as? FragmentActivity)?.supportFragmentManager
-                  fm?.let {
-                    val transaction = it.beginTransaction()
-                    transaction.add(R.id.log_fragment_box, LogFragment())
-                    transaction.commit()
-                    drawerLayout.findViewById<FrameLayout>(R.id.log_fragment_box).setPadding(0,0,0,getNavigationBarHeight(activity))
-                  }
-                }
-              }
-            }
-            activity.window.decorView.viewTreeObserver.addOnGlobalLayoutListener(
-                globalLayoutListener
-            )
+          override fun onActivityStarted(activity: Activity) {
           }
-        }
+
+          override fun onActivityResumed(activity: Activity) {
+
+          }
+
+          override fun onActivityPaused(activity: Activity) {
+          }
+
+          override fun onActivityStopped(activity: Activity) {
+          }
+
+          override fun onActivitySaveInstanceState(
+              activity: Activity,
+              outState: Bundle
+          ) {
+          }
+
+          override fun onActivityDestroyed(activity: Activity) {
+          }
+
+          override fun onActivityCreated(
+              activity: Activity,
+              savedInstanceState: Bundle?
+          ) {
+              if (debug && showType == DRAWER_SLIDE && activity is FragmentActivity) {
+                  val globalLayoutListener = object : OnGlobalLayoutListener {
+                      override fun onGlobalLayout() {
+                          activity.window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(
+                              this
+                          )
+                          val decorView = (activity.window.decorView as FrameLayout)
+                          val originView = decorView.getChildAt(0) as ViewGroup
+                          val rootPaddingTop = originView.paddingTop
+                          val rootPaddingLeft = originView.paddingLeft
+                          val rootPaddingRight = originView.paddingRight
+                          val rootPaddingBottom = originView.paddingBottom
+                          (originView.parent as ViewGroup).removeView(originView)
+                          val drawerLayout =
+                              activity.layoutInflater.inflate(
+                                  R.layout.view_drawer, originView, false
+                              ) as DrawerLayout
+                          drawerLayout.addView(originView, 0, originView.layoutParams)
+                          decorView.addView(drawerLayout, 0)
+                          decorView.post {
+                              val fm = (activity as? FragmentActivity)?.supportFragmentManager
+                              fm?.let {
+                                  val transaction = it.beginTransaction()
+                                  transaction.add(R.id.log_fragment_box, LogFragment())
+                                  transaction.commit()
+                                  val box = drawerLayout.findViewById<FrameLayout>(R.id.log_fragment_box)
+                                  val lp = (box.layoutParams as DrawerLayout.LayoutParams)
+                                  lp.bottomMargin = getNavigationBarHeight(activity)
+                                  box.layoutParams = lp
+                                  drawerLayout.findViewById<FrameLayout>(R.id.log_fragment_box)
+                                      .setPadding(
+                                          rootPaddingLeft,
+                                          rootPaddingTop,
+                                          rootPaddingRight,
+                                          rootPaddingBottom
+                                      )
+                              }
+                          }
+                      }
+                  }
+                  activity.window.decorView.viewTreeObserver.addOnGlobalLayoutListener(
+                      globalLayoutListener
+                  )
+              }
+          }
 
       })
     }
@@ -133,6 +142,6 @@ object Logger {
 
   private fun getNavigationBarHeight(context: Activity): Int {
     val view: View? = context.findViewById(android.R.id.navigationBarBackground)
-    return view?.height?:0
+    return view?.height ?: 0
   }
 }
