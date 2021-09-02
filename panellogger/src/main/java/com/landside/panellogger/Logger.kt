@@ -12,7 +12,7 @@ import androidx.core.content.FileProvider
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentActivity
 import com.landside.panellogger.Logger.ShowType.DRAWER_SLIDE
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
 import timber.log.Timber
 
 object Logger {
@@ -26,7 +26,7 @@ object Logger {
   var showType: ShowType = DRAWER_SLIDE
   var debug: Boolean = false
   private lateinit var application: Application
-  internal val logPublisher: PublishSubject<LogItem> = PublishSubject.create()
+  internal var logPublisher: ReplaySubject<LogItem>? = null
 
   val logTree: Timber.Tree = object : Timber.DebugTree() {
     override fun log(
@@ -37,7 +37,7 @@ object Logger {
     ) {
       if (debug) {
         super.log(priority, tag, message, t)
-        logPublisher.onNext(LogItem(LogPriority.from(priority), tag, message, t))
+        logPublisher?.onNext(LogItem(LogPriority.from(priority), tag, message, t))
       } else {
         // TODO: 2021/8/10 正式环境上报日志
       }
@@ -55,6 +55,7 @@ object Logger {
     }
 
     private fun install(app: Application) {
+      logPublisher = ReplaySubject.createWithSize(MAX_SIZE)
       Timber.plant(logTree)
       app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
 
@@ -84,7 +85,7 @@ object Logger {
               activity: Activity,
               savedInstanceState: Bundle?
           ) {
-              if (debug && showType == DRAWER_SLIDE && activity is FragmentActivity) {
+              if (debug && showType == DRAWER_SLIDE && activity is FragmentActivity && activity !is LogActivity) {
                   val globalLayoutListener = object : OnGlobalLayoutListener {
                       override fun onGlobalLayout() {
                           activity.window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(

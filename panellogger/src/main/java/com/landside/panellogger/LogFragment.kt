@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.item_log.view.*
 
 class LogFragment : Fragment(R.layout.fragment_log) {
 
-  private lateinit var logDisposable: Disposable
+  private var logDisposable: Disposable? = null
   private lateinit var adapter: LogAdapter
   private var listScrollY: Int = 0
   private var keyword: String = ""
@@ -52,7 +52,7 @@ class LogFragment : Fragment(R.layout.fragment_log) {
 
   override fun onDetach() {
     super.onDetach()
-    logDisposable.dispose()
+    logDisposable?.dispose()
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -98,14 +98,13 @@ class LogFragment : Fragment(R.layout.fragment_log) {
       }
     }
     logDisposable = Logger.logPublisher
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe {
+        ?.subscribeOn(Schedulers.io())
+        ?.observeOn(AndroidSchedulers.mainThread())
+        ?.subscribe {
           logData.value = logData.value?.toMutableList()
               ?.apply {
                 add(0, it)
               }
-              ?.take(Logger.MAX_SIZE)
               ?.toMutableList()
         }
   }
