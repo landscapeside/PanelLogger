@@ -56,6 +56,7 @@ object Logger {
 
     private fun install(app: Application) {
       logPublisher = ReplaySubject.createWithSize(MAX_SIZE)
+      logPublisher?.onNext(LogItem(LogPriority.INFO,"PannelLogger!","Hello!Welcome to PannelLogger!",null))
       Timber.plant(logTree)
       app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
 
