@@ -7,7 +7,7 @@ import com.landside.panellogger.Logger.ShowType.DRAWER_SLIDE
 class TestApp : Application() {
   override fun onCreate() {
     super.onCreate()
-    Logger.debug = true
+    Logger.debug = BuildConfig.DEBUG
     Logger.showType = DRAWER_SLIDE
   }
 }

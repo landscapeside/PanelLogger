@@ -5,22 +5,62 @@ plugins {
 }
 
 android {
+
+  signingConfigs {
+    debug {
+      v1SigningEnabled true
+      v2SigningEnabled true
+      storeFile file("../landside.jks")
+      storePassword "qwer1234"
+      keyAlias "landside"
+      keyPassword "qwer1234"
+    }
+
+    release {
+      v1SigningEnabled true
+      v2SigningEnabled true
+      storeFile file("../landside.jks")
+      storePassword "qwer1234"
+      keyAlias "landside"
+      keyPassword "qwer1234"
+    }
+  }
+
   compileSdkVersion 30
   buildToolsVersion "30.0.3"
 
   defaultConfig {
-    applicationId "com.landside.panellogger"
+    applicationId "com.landside.panellogger.example"
     minSdkVersion 21
     targetSdkVersion 30
     versionCode 1
     versionName "1.0"
-
+    flavorDimensions "log"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  productFlavors {
+    demo{}
+    display{
+      applicationIdSuffix ".display"
+    }
+    
+  }
+
+  sourceSets {
+    main {
+      if (isDisplay.toBoolean()) {
+        manifest.srcFile 'src/displayDebug/AndroidManifest.xml'
+      } else {
+        manifest.srcFile 'src/main/AndroidManifest.xml'
+      }
+    }
   }
 
   buildTypes {
     release {
       minifyEnabled false
+      signingConfig signingConfigs.release
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
   }
@@ -47,6 +87,13 @@ dependencies {
   androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
   implementation rootProject.ext.timber
+  implementation rootProject.ext.recyclerView
+
+
+  implementation "androidx.navigation:navigation-fragment-ktx:2.3.1"
+  implementation "androidx.navigation:navigation-ui-ktx:2.3.1"
+
+
   implementation project(':panellogger')
 //  implementation rootProject.ext.pandoraDebug
 }

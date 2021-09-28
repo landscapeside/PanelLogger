@@ -2,8 +2,12 @@ package com.landside.panellogger
 
 import android.app.Activity
 import android.app.Application
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
@@ -14,6 +18,7 @@ import androidx.fragment.app.FragmentActivity
 import com.landside.panellogger.Logger.ShowType.DRAWER_SLIDE
 import io.reactivex.subjects.ReplaySubject
 import timber.log.Timber
+import kotlin.concurrent.thread
 
 object Logger {
 
@@ -27,6 +32,7 @@ object Logger {
   var debug: Boolean = false
   private lateinit var application: Application
   internal var logPublisher: ReplaySubject<LogItem>? = null
+  internal var iLoggerInterface: ILoggerInterface? = null
 
   val logTree: Timber.Tree = object : Timber.DebugTree() {
     override fun log(
@@ -35,11 +41,13 @@ object Logger {
         message: String,
         t: Throwable?
     ) {
-      if (debug) {
-        super.log(priority, tag, message, t)
-        logPublisher?.onNext(LogItem(LogPriority.from(priority), tag, message, t))
-      } else {
-        // TODO: 2021/8/10 正式环境上报日志
+      synchronized(debug){
+        if (debug) {
+          super.log(priority, tag, message, t)
+          logPublisher?.onNext(LogItem(LogPriority.from(priority), tag, message, t))
+        } else {
+          iLoggerInterface?.recordLog(LogItem(LogPriority.from(priority), tag, message, t))
+        }
       }
     }
   }
@@ -56,8 +64,16 @@ object Logger {
 
     private fun install(app: Application) {
       logPublisher = ReplaySubject.createWithSize(MAX_SIZE)
-      logPublisher?.onNext(LogItem(LogPriority.INFO,"PannelLogger!","Hello!Welcome to PannelLogger!",null))
+      logPublisher?.onNext(
+          LogItem(
+              LogPriority.INFO,
+              "PannelLogger!",
+              "Hello!Welcome to PannelLogger!",
+              null
+          )
+      )
       Timber.plant(logTree)
+      bindRemote()
       app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
 
           override fun onActivityStarted(activity: Activity) {
@@ -111,7 +127,8 @@ object Logger {
                                   val transaction = it.beginTransaction()
                                   transaction.add(R.id.log_fragment_box, LogFragment())
                                   transaction.commit()
-                                  val box = drawerLayout.findViewById<FrameLayout>(R.id.log_fragment_box)
+                                  val box =
+                                      drawerLayout.findViewById<FrameLayout>(R.id.log_fragment_box)
                                   val lp = (box.layoutParams as DrawerLayout.LayoutParams)
                                   lp.bottomMargin = getNavigationBarHeight(activity)
                                   box.layoutParams = lp
@@ -136,6 +153,35 @@ object Logger {
     }
   }
 
+  private val conn = object : ServiceConnection {
+    override fun onServiceConnected(
+      name: ComponentName?,
+      service: IBinder?
+    ) {
+      iLoggerInterface = ILoggerInterface.Stub.asInterface(service)
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+      iLoggerInterface = null
+      application.unbindService(this)
+      thread {
+        Thread.sleep(2000)
+        bindRemote()
+      }
+    }
+
+  }
+
+  private fun bindRemote(){
+    application.bindService(
+        Intent("com.landside.panellogger.LOG_SERVER").apply {
+          setPackage("com.landside.panellogger.example.display")
+        },
+        conn,
+        Context.BIND_AUTO_CREATE
+    )
+  }
+
   fun popLogger() {
     val intent = Intent(application, LogActivity::class.java)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -145,5 +191,11 @@ object Logger {
   private fun getNavigationBarHeight(context: Activity): Int {
     val view: View? = context.findViewById(android.R.id.navigationBarBackground)
     return view?.height ?: 0
+  }
+
+  fun record(log: LogItem) {
+    synchronized(log){
+      logPublisher?.onNext(log)
+    }
   }
 }
