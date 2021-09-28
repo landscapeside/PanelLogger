@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
@@ -29,7 +30,7 @@ object Logger {
 
   var MAX_SIZE = 200
   var showType: ShowType = DRAWER_SLIDE
-  var debug: Boolean = false
+  private var debug: Boolean = false
   private lateinit var application: Application
   internal var logPublisher: ReplaySubject<LogItem>? = null
   internal var iLoggerInterface: ILoggerInterface? = null
@@ -63,6 +64,7 @@ object Logger {
     }
 
     private fun install(app: Application) {
+      debug = (app.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
       logPublisher = ReplaySubject.createWithSize(MAX_SIZE)
       logPublisher?.onNext(
           LogItem(
