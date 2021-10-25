@@ -1,4 +1,4 @@
-[![](https://www.jitpack.io/v/landscapeside/sliceRouter.svg)](https://www.jitpack.io/#landscapeside/sliceRouter)
+[![](https://www.jitpack.io/v/landscapeside/PanelLogger.svg)](https://www.jitpack.io/#landscapeside/PanelLogger)
 
 日志面板--手机上的logcat窗口
 
