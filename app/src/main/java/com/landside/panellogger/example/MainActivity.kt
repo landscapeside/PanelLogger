@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.landside.panellogger.Logger
 import kotlinx.android.synthetic.main.activity_main.*
-import timber.log.Timber
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -25,23 +24,23 @@ class MainActivity : AppCompatActivity() {
         thread {
             while (true) {
                 if (count % 7 == 0) {
-                    Timber.e(IllegalStateException("count is 7 times"))
+                    Logger.e(IllegalStateException("count is 7 times"))
                 }
-                Timber.w("$count")
+                Logger.w("$count")
                 count++
                 Thread.sleep(2000)
             }
         }
-        Timber.d("MainActivity#onCreate")
+        Logger.d("MainActivity#onCreate")
     }
 
     override fun onStart() {
         super.onStart()
-        Timber.d("MainActivity#onStart")
+        Logger.d("MainActivity#onStart")
     }
 
     override fun onRestart() {
         super.onRestart()
-        Timber.d("MainActivity#onRestart")
+        Logger.d("MainActivity#onRestart")
     }
 }

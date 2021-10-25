@@ -27,6 +27,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SecondActivity" />
+
+        <meta-data android:name="panel_logger_max_size" android:value="100" />
     </application>
 
 </manifest>
