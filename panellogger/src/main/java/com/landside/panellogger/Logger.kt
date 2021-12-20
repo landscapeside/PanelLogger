@@ -21,7 +21,18 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentActivity
 import com.landside.panellogger.Logger.ShowType.DRAWER_SLIDE
 import io.reactivex.subjects.ReplaySubject
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import timber.log.Timber
+import java.io.StringReader
+import java.io.StringWriter
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.Source
+import javax.xml.transform.TransformerException
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.stream.StreamSource
 import kotlin.concurrent.thread
 
 object Logger {
@@ -32,6 +43,10 @@ object Logger {
     FLOAT
   }
 
+  enum class LogType{
+    CONSOLE,DISK
+  }
+
   private const val MAX_SIZE = 200
   var showType: ShowType = DRAWER_SLIDE
   private var debug: Boolean = false
@@ -39,6 +54,9 @@ object Logger {
   internal var logPublisher: ReplaySubject<LogItem>? = null
   internal var iLoggerInterface: ILoggerInterface? = null
   private const val MAX_SIZE_KEY = "panel_logger_max_size"
+  private const val LOG_TYPE = "panel_logger_type"
+
+  private const val JSON_INDENT = 2
 
   val logTree: Timber.Tree = object : Timber.DebugTree() {
     override fun log(
@@ -51,6 +69,7 @@ object Logger {
         if (debug) {
           super.log(priority, tag, message, t)
           logPublisher?.onNext(LogItem(LogPriority.from(priority), tag, message, t))
+          iLoggerInterface?.recordLog(LogItem(LogPriority.from(priority), tag, message, t))
         } else {
           iLoggerInterface?.recordLog(LogItem(LogPriority.from(priority), tag, message, t))
         }
@@ -352,5 +371,40 @@ object Logger {
   ) = Timber.e(t, message, args)
 
   fun e(t: Throwable) = Timber.e(t)
+
+  fun json(jsonStr:String) {
+    try {
+      var json = jsonStr.trim { it <= ' ' }
+      if (json.startsWith("{")) {
+        val jsonObject = JSONObject(json)
+        val message = jsonObject.toString(JSON_INDENT)
+        d(message)
+        return
+      }
+      if (json.startsWith("[")) {
+        val jsonArray = JSONArray(json)
+        val message = jsonArray.toString(JSON_INDENT)
+        d(message)
+        return
+      }
+      e("Invalid Json")
+    } catch (e: JSONException) {
+      e("Invalid Json")
+    }
+  }
+
+  fun xml(xmlStr:String){
+    try {
+      val xmlInput: Source = StreamSource(StringReader(xmlStr))
+      val xmlOutput = StreamResult(StringWriter())
+      val transformer = TransformerFactory.newInstance().newTransformer()
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+      transformer.transform(xmlInput, xmlOutput)
+      d(xmlOutput.writer.toString().replaceFirst(">".toRegex(), ">\n"))
+    } catch (e: TransformerException) {
+      e("Invalid xml")
+    }
+  }
 
 }
