@@ -46,4 +46,16 @@ internal object JSONS {
             null
         } else sParser.parse(content).getAsJsonArray()
     }
+
+    fun String.isJson(): Boolean {
+        if (isEmpty()) {
+            return false
+        }
+        return try {
+            JsonParser().parse(this)
+            true
+        } catch (e: JsonParseException) {
+            false
+        }
+    }
 }
