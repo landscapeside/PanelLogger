@@ -31,7 +31,11 @@ data class LogItem(
     parcel.writeString(tag)
     parcel.writeString(message)
     if (t != null) {
-      parcel.writeException(t as Exception)
+      try {
+        parcel.writeException(t as Exception)
+      } catch (e: Exception) {
+        parcel.writeNoException()
+      }
     } else {
       parcel.writeNoException()
     }
