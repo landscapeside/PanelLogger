@@ -34,7 +34,7 @@ data class LogItem(
       try {
         parcel.writeException(t as Exception)
       } catch (e: Exception) {
-        parcel.writeNoException()
+        parcel.writeException(IllegalStateException(t.javaClass.name + t.localizedMessage))
       }
     } else {
       parcel.writeNoException()
