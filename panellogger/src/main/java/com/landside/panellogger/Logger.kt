@@ -297,78 +297,78 @@ object Logger {
   fun a(
     message: String,
     vararg args: Any?
-  ) = Timber.wtf(message, args)
+  ) = Timber.wtf(message.replace("%","%%"), args)
 
   fun a(
     t: Throwable,
     message: String,
     vararg args: Any?
-  ) = Timber.wtf(t, message, args)
+  ) = Timber.wtf(t, message.replace("%","%%"), args)
 
   fun a(t: Throwable) = Timber.wtf(t)
 
   fun v(
     msg: String,
     vararg args: Any?
-  ) = Timber.v(msg, args)
+  ) = Timber.v(msg.replace("%","%%"), args)
 
   fun v(
     t: Throwable,
     message: String,
     vararg args: Any?
-  ) = Timber.v(t, message, args)
+  ) = Timber.v(t, message.replace("%","%%"), args)
 
   fun v(t: Throwable) = Timber.v(t)
 
   fun d(
     message: String,
     vararg args: Any?
-  ) = Timber.d(message, args)
+  ) = Timber.d(message.replace("%","%%"), args)
 
   fun d(
     t: Throwable,
     message: String,
     vararg args: Any?
-  ) = Timber.d(t, message, args)
+  ) = Timber.d(t, message.replace("%","%%"), args)
 
   fun d(t: Throwable) = Timber.d(t)
 
   fun i(
     message: String,
     vararg args: Any?
-  ) = Timber.i(message, args)
+  ) = Timber.i(message.replace("%","%%"), args)
 
   fun i(
     t: Throwable,
     message: String,
     vararg args: Any?
-  ) = Timber.i(t, message, args)
+  ) = Timber.i(t, message.replace("%","%%"), args)
 
   fun i(t: Throwable) = Timber.i(t)
 
   fun w(
     message: String,
     vararg args: Any?
-  ) = Timber.w(message, args)
+  ) = Timber.w(message.replace("%","%%"), args)
 
   fun w(
     t: Throwable,
     message: String,
     vararg args: Any?
-  ) = Timber.w(t, message, args)
+  ) = Timber.w(t, message.replace("%","%%"), args)
 
   fun w(t: Throwable) = Timber.w(t)
 
   fun e(
     message: String,
     vararg args: Any?
-  ) = Timber.e(message, args)
+  ) = Timber.e(message.replace("%","%%"), args)
 
   fun e(
     t: Throwable,
     message: String,
     vararg args: Any?
-  ) = Timber.e(t, message, args)
+  ) = Timber.e(t, message.replace("%","%%"), args)
 
   fun e(t: Throwable) = Timber.e(t)
 
